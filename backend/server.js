@@ -1,4 +1,4 @@
-require("dotenv").config(); // load environment variables from .env file
+const dotenv = require("dotenv"); // load environment variables from .env file
 
 const express = require("express");
 const { Sequelize, Model, DataTypes } = require("sequelize");
