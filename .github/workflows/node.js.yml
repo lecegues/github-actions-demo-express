@@ -1,16 +1,22 @@
-name: Node.js CI
+name: PERN CI
 
-on:
+on: 
   push:
-    branches: [ main ]
+    branches: ["main"]
   pull_request:
-    branches: [ main ]
+    branches: ["main"]
 
 jobs:
-  build:
 
+  build-backend:
     runs-on: ubuntu-latest
 
+    strategy:
+      max-parallel: 2
+      matrix:
+        node-version: [14.x,16.x]
+
+      # define service containers
     services:
       postgres:
         image: postgres:latest
@@ -18,35 +24,26 @@ jobs:
           POSTGRES_DB: testdb
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
+          POSTGRES_HOST: localhost
         ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    strategy:
-      matrix:
-        node-version: [14.x]
+           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: cd backend && npm ci
-    - run: cd frontend && npm ci
-    - name: Set up PostgreSQL
-      run: |
-        echo "POSTGRES_HOST=localhost" >> $GITHUB_ENV
-        echo "POSTGRES_DB=testdb" >> $GITHUB_ENV
-        echo "POSTGRES_USER=user" >> $GITHUB_ENV
-        echo "POSTGRES_PASSWORD=password" >> $GITHUB_ENV
-    - name: Build Frontend
-      run: cd frontend && npm run build
-    - name: Test Backend
-      run: cd backend && npm test
-    - name: Test Frontend
-      run: cd frontend && npm test
+      - uses: actions/checkout@v3
+
+        # set up node first
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: |
+          npm ci
+
+      - name: Build backend
+        working-directory: ./backend
+        run: |
+          npm run build
+      
