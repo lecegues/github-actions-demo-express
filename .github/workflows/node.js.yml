@@ -80,4 +80,70 @@ jobs:
           name: frontend-build-artifact
           path: frontend/release.zip
 
+  ### Run Backend Unit Tests ###
+  unit-test-backend:
+    runs-on: ubuntu-latest
+    needs: build-backend
+    steps:
+      - uses: actions/checkout@v3
+
+      # Need Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: |
+          npm install
+
+      - name: Download Backend Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: backend-build-artifact
+          path: backend/
+
+      - name: Unzip Backend Artifact
+        run: unzip backend/release.zip
+
+        # Run Backend UNIT Tests
+      - name: Run Backend Unit Tests
+        working-directory: ./backend
+        run: npm test
+  ### Run Frontend Unit Tests ###
+  unit-test-frontend:
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    steps:
+      - uses: actions/checkout@v3
+
+      # Need Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: |
+          npm install
+        
+
+      - name: Download Frontend Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: frontend-build-artifact
+          path: frontend/
+
+      - name: Unzip Frontend Artifact
+        run: unzip frontend/release.zip
+
+      # Run Frontend UNIT Tests
+      # Unit Tests with Jest
+      # Integration/E2E tests with Playwiright and/or Selenium
+      - name: Run Frontend Unit Tests
+        working-directory: ./frontend
+        run: npm test
+
       
