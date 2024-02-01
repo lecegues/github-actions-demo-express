@@ -11,6 +11,7 @@ app.use(express.json()); // parse json
 app.use(express.urlencoded({ extended: true })); // parse
 
 // Initialize Sequelize
+/*
 const sequelize = new Sequelize(
   process.env.POSTGRES_DB, // DB name
   process.env.POSTGRES_USER, // user name
@@ -20,6 +21,12 @@ const sequelize = new Sequelize(
     dialect: "postgres",
   }
 );
+*/
+
+const sequelize = new Sequelize("testdb", "user", "password", {
+  host: "localhost",
+  dialect: "postgres",
+});
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
